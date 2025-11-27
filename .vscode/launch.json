@@ -1,0 +1,46 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug gtfsgraph",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug/gtfs2graph",
+            "args": ["-m", "3", "/data/after-pfaedle.zip", ">", "/data/phili_bus.json"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [], 
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+	    "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+	    ]
+        },
+        {
+            "name": "Debug transitmap",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug/transitmap",
+            //"args": ["<", "/data/phili_bus_out.json", "--render-engine", "mvt", "-z", "17", "--mvt-path", "/data"],
+            "args": ["<", "/data/phili_bus_out.json", ">", "/data/phili_bus_test67.svg"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+	        "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+	    ]
+        }
+    ]
+}

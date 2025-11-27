@@ -356,6 +356,7 @@ void MvtRenderer::renderClique(const InnerClique& cc, const LineNode* n) {
         paramsOut["class"] = getLineClass(c.geoms[i].from.line->id());
         paramsOut["width"] =
             util::toString((2.0 * _cfg->outlineWidth + _cfg->lineWidth));
+        paramsOut["otherLines"] = util::toString(c.geoms[i].from.line->otherLines());
 
         if (n->pl().getComponent() != std::numeric_limits<uint32_t>::max())
           paramsOut["component"] = util::toString(n->pl().getComponent());
@@ -370,6 +371,8 @@ void MvtRenderer::renderClique(const InnerClique& cc, const LineNode* n) {
       params["lineCap"] = "round";
       params["class"] = getLineClass(c.geoms[i].from.line->id());
       params["width"] = util::toString(_cfg->lineWidth);
+      params["otherLines"] = util::toString(c.geoms[i].from.line->otherLines());
+
 
       if (n->pl().getComponent() != std::numeric_limits<uint32_t>::max())
         params["component"] = util::toString(n->pl().getComponent());
@@ -431,7 +434,7 @@ void MvtRenderer::renderEdgeTripGeom(const RenderGraph& outG,
       css = lo.style.get().getCss();
       oCss = lo.style.get().getOutlineCss();
     }
-
+    std::cout << line->otherLines().size() << std::endl;
     if (_cfg->outlineWidth > 0) {
       Params paramsOut;
       paramsOut["color"] = "000000";
@@ -439,6 +442,7 @@ void MvtRenderer::renderEdgeTripGeom(const RenderGraph& outG,
       paramsOut["line"] = line->label();
       paramsOut["lineCap"] = "butt";
       paramsOut["class"] = getLineClass(line->id());
+      paramsOut["otherLines"] = util::toString(line->otherLines());
       paramsOut["width"] =
           util::toString((2.0 * _cfg->outlineWidth + _cfg->lineWidth));
 
@@ -455,6 +459,7 @@ void MvtRenderer::renderEdgeTripGeom(const RenderGraph& outG,
     params["lineCap"] = "round";
     params["class"] = getLineClass(line->id());
     params["width"] = util::toString(_cfg->lineWidth);
+    params["otherLines"] = util::toString(line->otherLines());
 
     if (e->pl().getComponent() != std::numeric_limits<uint32_t>::max())
       params["component"] = util::toString(e->pl().getComponent());

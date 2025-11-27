@@ -184,8 +184,10 @@ class LineGraph : public util::graph::UndirGraph<LineNodePL, LineEdgePL> {
   void buildGrids();
   void extractLines(const nlohmann::json::object_t& pars, LineEdge* e,
                     const std::map<std::string, LineNode*>& idMap);
+                    //modified by James to store other lines with same color
   void extractLine(const nlohmann::json::object_t& pars, LineEdge* e,
-                   const std::map<std::string, LineNode*>& idMap);
+                   const std::map<std::string, LineNode*>& idMap,
+                  std::vector<std::string> otherLines);
 
   std::string getLineColor(const nlohmann::json::object_t& line);
   std::string getLineLabel(const nlohmann::json::object_t& line);

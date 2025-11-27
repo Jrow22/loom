@@ -140,6 +140,55 @@ void Builder::simplify(BuildGraph* g) {
   for (auto e : toDel) g->delEdg(e->getFrom(), e->getTo());
 }
 
+// ADDED: JAMES
+
+// This function was added to use distances when getting edges
+
+// that are connecting stops.
+
+PolyLine<double> Builder::getSegmentByDist(const double distA, const double distB,
+
+const Shape* shape) {
+
+if (distA > distB) throw std::runtime_error("Distance a must be greater than b");
+
+PolyLine<double> line;
+
+
+//Returns first point that is less then or equal to starting distance
+
+auto start = std::lower_bound(shape->getPoints().begin(), shape->getPoints().end(),
+
+distA, [](const ad::cppgtfs::gtfs::ShapePoint& point, const double val) {
+
+return point.travelDist < val;
+
+});
+
+  
+
+//Returns the last point which is the first point less ten or equal to ending distance
+
+auto end = std::upper_bound(shape->getPoints().begin(), shape->getPoints().end(),
+
+distB, [](const double val, const ad::cppgtfs::gtfs::ShapePoint& point) {
+
+return point.travelDist > val;
+
+});
+
+  
+
+for (auto it = start; it != end; ++it) {
+
+line << getProjP(it->lat, it->lng);
+
+}
+
+return line;
+
+}
+
 // _____________________________________________________________________________
 std::pair<bool, PolyLine<double>> Builder::getSubPolyLine(const Stop* a,
                                                           const Stop* b,
@@ -169,7 +218,9 @@ std::pair<bool, PolyLine<double>> Builder::getSubPolyLine(const Stop* a,
 
   PolyLine<double> p;
 
-  p = pl->second.getSegment(ap, bp);
+  //p = pl->second.getSegment(ap, bp);
+
+  p = getSegmentByDist(distA, distB, pl->first);
 
   return std::pair<bool, PolyLine<double>>(true, p);
 }

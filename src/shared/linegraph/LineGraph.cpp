@@ -32,7 +32,7 @@ using util::graph::Algorithm;
 
 // _____________________________________________________________________________
 void LineGraph::readFromDot(std::istream* s) {
-  _bbox = util::geo::Box<double>();
+  /*_bbox = util::geo::Box<double>();
 
   dot::parser::Parser dp(s);
   std::map<std::string, LineNode*> idMap;
@@ -148,7 +148,7 @@ void LineGraph::readFromDot(std::istream* s) {
   }
 
   _bbox = util::geo::pad(_bbox, 100);
-  buildGrids();
+  buildGrids();*/
 }
 // _____________________________________________________________________________
 void LineGraph::readFromTopoJson(nlohmann::json::array_t objects,
@@ -572,16 +572,33 @@ bool LineGraph::lineCtd(const LineEdge* frEdg, const LineEdge* toEdg,
   return lineCtd(frEdg, frLn, toEdg, toLn);
 }
 
+// modified by James
 // _____________________________________________________________________________
 bool LineGraph::lineCtd(const LineEdge* frEdg, const LineOcc& frLn,
                         const LineEdge* toEdg, const LineOcc& toLn) {
-  if (frLn.line != toLn.line) return false;
+ 
+  if (frLn.line != toLn.line && frLn.line->color() != toLn.line->color()) return false;
   const auto* n = sharedNode(frEdg, toEdg);
   if (!n || n->getDeg() == 1) return false;
+  // These check if the line id is contained in other lines other lines
+  // array to connect same color lines with same id. But also prevent
+  // all lines from being connected.
+  auto toLine = toLn.line->otherLines();
+  auto fromLine = frLn.line->otherLines();
+  auto toLnContainsFrLn = std::find(toLine.begin(), 
+  toLine.end(), frLn.line->label());
+  auto fromLnContainsToLn =  std::find(fromLine.begin(), 
+  fromLine.end(), toLn.line->label());
+  bool linesAreEqual = frLn.line == toLn.line;
   return (frLn.direction == 0 || toLn.direction == 0 ||
           (frLn.direction == n && toLn.direction != n) ||
           (frLn.direction != n && toLn.direction == n)) &&
-         n->pl().connOccurs(frLn.line, frEdg, toEdg);
+          // This check if lines are equal or each lines contains id of others
+          // in other vector
+          (linesAreEqual || toLnContainsFrLn != toLn.line->otherLines().end() ||
+          fromLnContainsToLn != frLn.line->otherLines().end());
+          /*&&
+         n->pl().connOccurs(frLn.line, frEdg, toEdg);*/
 }
 
 // _____________________________________________________________________________
@@ -1312,10 +1329,22 @@ void LineGraph::extractLines(const nlohmann::json::object_t& props, LineEdge* e,
   auto i = props.find("lines");
 
   if (i == props.end()) {
-    extractLine(props, e, idMap);
+    extractLine(props, e, idMap, std::vector<std::string>());
   } else {
     for (auto line : i->second) {
-      extractLine(line, e, idMap);
+      std::vector<std::string> linesWithSameColor;
+      std::string color = getLineColor(line);
+      // check if this line matches the color of other lines in array
+      // for each match add to the line
+      for (auto otherLines : i -> second) {
+        std::string otherLineColor = getLineColor(otherLines);
+        std::string id = getLineId(otherLines);
+        std::string label = getLineLabel(otherLines);
+        if (color == otherLineColor) {
+          linesWithSameColor.push_back(label);
+        }
+      }
+      extractLine(line, e, idMap, linesWithSameColor);
     }
   }
 }
@@ -1448,17 +1477,26 @@ std::string LineGraph::getStationLabel(const nlohmann::json::object_t& line) {
 
   return util::trim(label, "\"");
 }
-
+// Modified by James
 // _____________________________________________________________________________
 void LineGraph::extractLine(const nlohmann::json::object_t& line, LineEdge* e,
-                            const std::map<std::string, LineNode*>& idMap) {
+                            const std::map<std::string, LineNode*>& idMap,
+                            std::vector<std::string> otherLines) {
   std::string id = getLineId(line);
   std::string color = getLineColor(line);
   std::string label = getLineLabel(line);
 
+  // Do not extract lines with same color on same edge
+  // TODO add attribute of color to line
+  for (auto line : e->pl().getLines()) {
+    if (color == line.line->color()) {
+      return;
+    }
+  }
+
   const Line* l = getLine(id);
   if (!l) {
-    l = new Line(id, label, color);
+    l = new Line(id, label, color, otherLines);
     addLine(l);
   }
 

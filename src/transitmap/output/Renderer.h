@@ -6,6 +6,7 @@
 #define TRANSITMAP_OUTPUT_RENDERER_H_
 
 #include "shared/rendergraph/RenderGraph.h"
+#include <variant>
 
 namespace transitmapper {
 namespace output {

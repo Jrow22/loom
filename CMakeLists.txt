@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.5)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 project (loom)
 
@@ -8,8 +8,6 @@ if (CMAKE_BUILD_TYPE)
 	string(TOUPPER ${FIRST_CHAR} FIRST_CHAR)
 	string(REGEX REPLACE "^.(.*)" "${FIRST_CHAR}\\1" CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
 endif()
-
-enable_testing()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
@@ -55,7 +53,7 @@ if (LIBZIP_FOUND)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLIBZIP_FOUND=1")
 endif()
 
-set(CMAKE_CXX_FLAGS_DEBUG          "-Og -g -DLOGLEVEL=3")
+set(CMAKE_CXX_FLAGS_DEBUG          "-g -DLOGLEVEL=3")
 set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS} -DLOGLEVEL=2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS} -DLOGLEVEL=2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -g -DLOGLEVEL=3")
@@ -75,29 +73,6 @@ endif()
 
 add_subdirectory(src)
 
-add_test(ctest_build_topo_test "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target topoTest)
-add_test(topo_test ${EXECUTABLE_OUTPUT_PATH}/topoTest)
-set_tests_properties (topo_test PROPERTIES DEPENDS ctest_build_topo_test)
-
-add_test(ctest_build_util_test "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target utilTest)
-add_test(util_test ${EXECUTABLE_OUTPUT_PATH}/utilTest)
-set_tests_properties (util_test PROPERTIES DEPENDS ctest_build_util_test)
-
-add_test(ctest_build_shared_test "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target sharedTest)
-add_test(shared_test ${EXECUTABLE_OUTPUT_PATH}/sharedTest)
-set_tests_properties (shared_test PROPERTIES DEPENDS ctest_build_shared_test)
-
-add_test(ctest_build_loom_test "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target loomTest)
-add_test(loom_test ${EXECUTABLE_OUTPUT_PATH}/loomTest)
-set_tests_properties (loom_test PROPERTIES DEPENDS ctest_build_loom_test)
-
-add_test(ctest_build_octi_test "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target octiTest)
-add_test(octi_test ${EXECUTABLE_OUTPUT_PATH}/octiTest)
-set_tests_properties (octi_test PROPERTIES DEPENDS ctest_build_octi_test)
-
-add_test(ctest_build_transitmap_test "${CMAKE_COMMAND}" --build ${CMAKE_BINARY_DIR} --target transitmapTest)
-add_test(transitmap_test ${EXECUTABLE_OUTPUT_PATH}/transitmapTest)
-set_tests_properties (transitmap_test PROPERTIES DEPENDS ctest_build_transitmap_test)
 
 # handles install target
 

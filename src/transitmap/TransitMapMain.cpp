@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
       b.expandOverlappinFronts(&g);
       g.createMetaNodes();
     }
-
+    
     LOGTO(DEBUG, std::cerr) << "Outputting to SVG ...";
     transitmapper::output::SvgRenderer svgOut(&std::cout, &cfg);
     svgOut.print(g);

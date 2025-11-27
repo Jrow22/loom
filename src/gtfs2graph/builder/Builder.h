@@ -27,6 +27,7 @@ using util::geo::Line;
 using util::geo::Point;
 using util::geo::PolyLine;
 using util::geo::SharedSegment;
+using ad::cppgtfs::gtfs::Shape;
 
 typedef Grid<Node*, Point, double> NodeGrid;
 typedef Grid<Edge*, Line, double> EdgeGrid;
@@ -47,6 +48,9 @@ class Builder {
   const config::Config* _cfg;
 
   std::map<const ad::cppgtfs::gtfs::Stop*, Node*> _stopNodes;
+
+  //added by James
+  PolyLine<double> getSegmentByDist(const double distA, const double distB, const Shape* shape);
 
   // map of compiled polylines, to avoid calculating them each time
   std::unordered_map<ad::cppgtfs::gtfs::Shape*, PolyLine<double>> _polyLines;
